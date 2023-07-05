@@ -42,6 +42,8 @@
               88 INPFILE-OK        VALUE 00.
               88 INPFILE-EOF       VALUE 10.
        77  CHECK-ID       PIC 9(5) VALUE 10010.
+       77  AMOUNT         PIC 9(15) VALUE 2400.
+       77  SUBPROG0     PIC X(9) VALUE "EXTRAPR0".
       *****************************************************************
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
@@ -73,13 +75,15 @@
 
        H200-PROCESS.
            IF INP-ID NOT > CHECK-ID
-                COMPUTE INP-BALANCE = INP-BALANCE + 1500
+                CALL SUBPROG0 
+                USING INP-DVZ, AMOUNT, INP-BALANCE, OUT-BALANCE
                 MOVE INP-ID TO OUT-ID
                 MOVE INP-DVZ TO OUT-DVZ
                 MOVE INP-NAME TO OUT-NAME
                 MOVE INP-DATE TO OUT-DATE
-                MOVE INP-BALANCE TO OUT-BALANCE
                 WRITE OUT-REC
+           ELSE
+              WRITE OUT-REC
            END-IF.
            READ INP-FILE.
        H200-END. EXIT.
@@ -89,3 +93,36 @@
            CLOSE OUT-FILE.
            STOP RUN.
        H300-END. EXIT.
+      
+       END PROGRAM EXTRAPR.
+      *****************************************************************
+
+      *****************************************************************
+      * Program name:    EXTRAPR0                               
+      * Original author: YUNUS EMRE AKDIK                                       
+      *****************************************************************
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.  EXTRAPR0.
+       AUTHOR. YUNUS EMRE AKDIK. 
+      *****************************************************************
+       DATA DIVISION.
+       LINKAGE SECTION.
+       77 INPUT-EXC        PIC 9(3).
+       77 INPUT-AMOUNT     PIC 9(15).
+       77 INPUT-BALANCE    PIC 9(15).
+       77 RESULT           PIC 9(15).
+      *****************************************************************
+       PROCEDURE DIVISION 
+           USING INPUT-EXC, INPUT-AMOUNT, INPUT-BALANCE, RESULT.
+
+           IF INPUT-EXC = 840
+              COMPUTE RESULT = INPUT-BALANCE + (INPUT-AMOUNT * 0.86)
+           ELSE IF INPUT-EXC = 978
+              COMPUTE RESULT = INPUT-BALANCE + (INPUT-AMOUNT * 0.98)
+           ELSE IF INPUT-EXC = 949
+              COMPUTE RESULT = INPUT-BALANCE + (INPUT-AMOUNT * 0.84)
+           ELSE
+              COMPUTE RESULT = INPUT-BALANCE + INPUT-AMOUNT
+            END-IF.
+           GOBACK.
+       END PROGRAM EXTRAPR0.
