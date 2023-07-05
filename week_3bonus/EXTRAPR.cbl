@@ -3,7 +3,7 @@
       * Original author: Yunus Emre Akdik
       *****************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.  EXTRAPR.
+       PROGRAM-ID. EXTRAPR.
        AUTHOR. Yunus Emre Akdik
       *****************************************************************
       *****************************************************************
@@ -43,7 +43,6 @@
               88 INPFILE-EOF       VALUE 10.
        77  CHECK-ID       PIC 9(5) VALUE 10010.
        77  AMOUNT         PIC 9(15) VALUE 2400.
-       77  SUBPROG0     PIC X(9) VALUE "EXTRAPR0".
       *****************************************************************
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
@@ -75,14 +74,18 @@
 
        H200-PROCESS.
            IF INP-ID NOT > CHECK-ID
-                CALL SUBPROG0 
-                USING INP-DVZ, AMOUNT, INP-BALANCE, OUT-BALANCE
+           CALL 'SUBPRG' USING INP-DVZ, AMOUNT, INP-BALANCE, OUT-BALANCE
                 MOVE INP-ID TO OUT-ID
                 MOVE INP-DVZ TO OUT-DVZ
                 MOVE INP-NAME TO OUT-NAME
                 MOVE INP-DATE TO OUT-DATE
                 WRITE OUT-REC
            ELSE
+              MOVE INP-ID TO OUT-ID
+              MOVE INP-DVZ TO OUT-DVZ
+              MOVE INP-NAME TO OUT-NAME
+              MOVE INP-DATE TO OUT-DATE
+              MOVE INP-BALANCE TO OUT-BALANCE
               WRITE OUT-REC
            END-IF.
            READ INP-FILE.
@@ -93,17 +96,16 @@
            CLOSE OUT-FILE.
            STOP RUN.
        H300-END. EXIT.
-      
+
        END PROGRAM EXTRAPR.
       *****************************************************************
-
       *****************************************************************
-      * Program name:    EXTRAPR0                               
-      * Original author: YUNUS EMRE AKDIK                                       
+      * Program name:    EXTRAPR0
+      * Original author: YUNUS EMRE AKDIK
       *****************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID.  EXTRAPR0.
-       AUTHOR. YUNUS EMRE AKDIK. 
+       PROGRAM-ID. SUBPRG.
+       AUTHOR. YUNUS EMRE AKDIK.
       *****************************************************************
        DATA DIVISION.
        LINKAGE SECTION.
@@ -112,7 +114,7 @@
        77 INPUT-BALANCE    PIC 9(15).
        77 RESULT           PIC 9(15).
       *****************************************************************
-       PROCEDURE DIVISION 
+       PROCEDURE DIVISION
            USING INPUT-EXC, INPUT-AMOUNT, INPUT-BALANCE, RESULT.
 
            IF INPUT-EXC = 840
@@ -125,4 +127,5 @@
               COMPUTE RESULT = INPUT-BALANCE + INPUT-AMOUNT
             END-IF.
            GOBACK.
-       END PROGRAM EXTRAPR0.
+       END PROGRAM SUBPRG.
+
